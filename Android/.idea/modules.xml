@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bigprojects2remake.iml" filepath="$PROJECT_DIR$/.idea/modules/bigprojects2remake.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/bigprojects2remake.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/bigprojects2remake.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/bigprojects2remake.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/bigprojects2remake.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/bigprojects2remake.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/bigprojects2remake.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/bigprojects2remake.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/bigprojects2remake.app.unitTest.iml" />
+    </modules>
+  </component>
+</project>
