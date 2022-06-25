@@ -1,13 +1,28 @@
 import torch,time,numpy as np
-from flask import jsonify
+from flask import Flask,jsonify
 from transformers import BertTokenizerFast, BertForQuestionAnswering, Trainer, TrainingArguments
+from flask_sqlalchemy import SQLAlchemy
+app = Flask(__name__)
+db = SQLAlchemy()
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bigprojeks2.db'
+class HISTORY(db.Model):
+    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    nama = db.Column(db.String(100))
+    konteks = db.Column(db.String(3000))
+    pertanyaan = db.Column(db.String(1000))
+    rank = db.Column(db.String(100))
+    jawaban = db.Column(db.String(1000))
+    score = db.Column(db.String(100))
+    waktu_proses = db.Column(db.String(100))
+db.init_app(app)  
 device = "cuda" if torch.cuda.is_available() else "cpu" 
 torch.device(device) 
 modelCheckpoint = "indolem/indobert-base-uncased"
 model = BertForQuestionAnswering.from_pretrained("model")
 tokenizer = BertTokenizerFast.from_pretrained(modelCheckpoint)
 start_time = time.time()
-def bert_prediction(context,question):
+def bert_prediction(user,context,question):
   encodedData = tokenizer(question, context, padding=True, return_offsets_mapping=True, truncation="only_second", return_tensors="pt")
   offsetMapping = encodedData.pop("offset_mapping")[0]
   encodedData.to(device)
@@ -53,4 +68,7 @@ def bert_prediction(context,question):
       score = str(candidate['score'])#convert float32 to string
       dictlogs.update({"rank": rank,"jawaban": candidate['text'], "score":score,"waktu_proses":str(time.time() - start_time)})
       respon_model.append(dictlogs)
+      history = HISTORY(nama=user,konteks=context,pertanyaan=question,rank= rank,jawaban=candidate['text'],score=score,waktu_proses=str(time.time() - start_time))
+      db.session.add(history)
+      db.session.commit()
   return jsonify(respon_model)

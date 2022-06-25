@@ -1,28 +1,17 @@
-import random,string
+import random,string,json
 from flask import Flask,jsonify, request
-from bert import bert_prediction
+from bert import bert_prediction,db,HISTORY,app
 from werkzeug.security import check_password_hash,generate_password_hash
 from flask_restful import Resource, Api
-from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPTokenAuth
 auth = HTTPTokenAuth(scheme='Bearer')
-db = SQLAlchemy()
-app = Flask(__name__)
 api = Api(app)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bigprojeks2.db'
 class ADMIN(db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(1000))
     token = db.Column(db.String(1000))
-class HISTORY(db.Model):
-    score = db.Column(db.String(100))
-    rank = db.Column(db.String(100))
-    jawaban = db.Column(db.String(1000))
-    nama = db.Column(db.String(1000),primary_key=True)
-    waktu_proses = db.Column(db.String(1000))
 db.init_app(app)
 @auth.verify_token
 def verify_token(token):
@@ -52,23 +41,34 @@ class apilogin(Resource):
 class apipredict(Resource):
     @auth.login_required
     def post(self):
+        user=format(auth.current_user())
+        print(user)
         context = request.json['konteks']
         question = request.json['pertanyaan']
-        prediction = bert_prediction(context,question)
-        print(prediction)
+        prediction = bert_prediction(user,context,question)
         return prediction
 class apihistory(Resource):
     @auth.login_required
     def get(self):
-        context = request.json['konteks']
-        question = request.json['pertanyaan']
-        prediction = bert_prediction(context,question)
-        print(self.name)
-        history = HISTORY(nama=self.name,rank= prediction['rank'],jawaban=prediction['jawaban'],score=prediction['score'],waktu_proses=prediction['waktu_proses'])
-        db.session.add(history)
-        db.session.commit()
-        print(prediction)
-        return prediction
+        histories = HISTORY.query.all()
+        output = [
+            {
+                "nama":history.nama,
+                "konteks":history.konteks, 
+                "pertanyaan":history.pertanyaan,  
+                "rank":history.rank, 
+                "jawaban":history.jawaban,  
+                "score":history.score, 
+                "waktu_proses":history.waktu_proses
+            } 
+            for history in histories
+        ]
+        response = {
+            "code" : 200, 
+            "msg"  : "Query data sukses",
+            "data" : output
+        }
+        return response, 200
 api.add_resource(apisignup, '/api/v1/users/create', methods=['POST'])
 api.add_resource(apilogin, '/api/v1/users/login', methods=['POST'])
 api.add_resource(apipredict, '/api/v1/model/rankanswer', methods=['POST'])
