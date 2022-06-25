@@ -50,7 +50,7 @@ class apipredict(Resource):
 class apihistory(Resource):
     @auth.login_required
     def get(self):
-        histories = HISTORY.query.all()
+        histories = HISTORY.query.filter_by(nama=auth.current_user()).first()
         output = [
             {
                 "nama":history.nama,
@@ -61,13 +61,11 @@ class apihistory(Resource):
                 "score":history.score, 
                 "waktu_proses":history.waktu_proses
             } 
-            for history in histories
-        ]
+            for history in histories]
         response = {
             "code" : 200, 
             "msg"  : "Query data sukses",
-            "data" : output
-        }
+            "data" : output}
         return response, 200
 api.add_resource(apisignup, '/api/v1/users/create', methods=['POST'])
 api.add_resource(apilogin, '/api/v1/users/login', methods=['POST'])

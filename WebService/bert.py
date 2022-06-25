@@ -7,7 +7,7 @@ db = SQLAlchemy()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bigprojeks2.db'
 class HISTORY(db.Model):
-    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    id = db.Column(db.Integer, primary_key=True) # kudu ana primary key
     nama = db.Column(db.String(100))
     konteks = db.Column(db.String(3000))
     pertanyaan = db.Column(db.String(1000))
@@ -28,7 +28,7 @@ def bert_prediction(user,context,question):
   encodedData.to(device)
   model.to(device)
 
-  model.eval() # IMPORTANT! Set the model as evaluation mode.
+  model.eval() 
   with torch.no_grad(): # IMPORTANT! Do not computing gradient!
     outputs = model(encodedData["input_ids"], attention_mask=encodedData["attention_mask"]) # Feed forward. Without calculating loss.
 
@@ -68,6 +68,7 @@ def bert_prediction(user,context,question):
       score = str(candidate['score'])#convert float32 to string
       dictlogs.update({"rank": rank,"jawaban": candidate['text'], "score":score,"waktu_proses":str(time.time() - start_time)})
       respon_model.append(dictlogs)
+      #langsung save db bosku
       history = HISTORY(nama=user,konteks=context,pertanyaan=question,rank= rank,jawaban=candidate['text'],score=score,waktu_proses=str(time.time() - start_time))
       db.session.add(history)
       db.session.commit()
