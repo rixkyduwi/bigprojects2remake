@@ -64,7 +64,7 @@ class apihistory(Resource):
             for history in histories]
         response = {
             "code" : 200, 
-            "msg"  : "Query data sukses",
+            "msg"  : "berikut history anda",
             "data" : output}
         return response, 200
 api.add_resource(apisignup, '/api/v1/users/create', methods=['POST'])

@@ -19,7 +19,7 @@ db.init_app(app)
 device = "cuda" if torch.cuda.is_available() else "cpu" 
 torch.device(device) 
 modelCheckpoint = "indolem/indobert-base-uncased"
-model = BertForQuestionAnswering.from_pretrained("model")
+model = BertForQuestionAnswering.from_pretrained("model")#download model di https://drive.google.com/drive/folders/10LEq0NZD6j_1VMFdtpysSewGAWfXuUBF?usp=sharing kemudian di masukan ke folder model
 tokenizer = BertTokenizerFast.from_pretrained(modelCheckpoint)
 start_time = time.time()
 def bert_prediction(user,context,question):
@@ -59,10 +59,17 @@ def bert_prediction(user,context,question):
       dictlogs = {}
       rank = str(i+1)#convert number rank to string
       score = str(candidate['score'])#convert float32 to string
-      dictlogs.update({"rank": rank,"jawaban": candidate['text'], "score":score,"waktu_proses":str(time.time() - start_time)})
-      respon_model.append(dictlogs)
-      #langsung save db bosku
-      history = HISTORY(nama=user,konteks=context,pertanyaan=question,rank= rank,jawaban=candidate['text'],score=score,waktu_proses=str(time.time() - start_time))
-      db.session.add(history)
-      db.session.commit()
+      if candidate['score'] <=0: # menambahkan apabila jawaban salah 
+        dictlogs.update({"jawaban": "maaf saya tidak tahu"})
+        respon_model.append(dictlogs)
+        history = HISTORY(nama=user,konteks=context,pertanyaan=question,rank= rank,jawaban=candidate['text'],score=score,waktu_proses=str(time.time() - start_time))
+        db.session.add(history)
+        db.session.commit()
+      else: #apabila jawaban ditemukan dan score melebihi 0
+        dictlogs.update({"rank": rank,"jawaban": candidate['text'], "score":score,"waktu_proses":str(time.time() - start_time)})
+        respon_model.append(dictlogs)
+        #langsung save db bosku
+        history = HISTORY(nama=user,konteks=context,pertanyaan=question,rank= rank,jawaban=candidate['text'],score=score,waktu_proses=str(time.time() - start_time))
+        db.session.add(history)
+        db.session.commit()
   return jsonify(respon_model)
