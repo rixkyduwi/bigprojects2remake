@@ -19,6 +19,9 @@
             android:name=".BottomNav"
             android:exported="false"/>
         <activity
+            android:name=".ui.dashboard.chatbot"
+            android:exported="true"/>
+        <activity
             android:name=".SplashScreen"
             android:exported="true">
             <intent-filter>

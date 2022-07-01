@@ -19,7 +19,8 @@ object BotResponse {
             //
             message.contains("context") -> {
                 val context = message
-                context
+
+                "silahkan masukan pertanyaan"
             }
             //
             message.contains("?") -> {
@@ -33,7 +34,6 @@ object BotResponse {
             message.contains("flip") && message.contains("coin") -> {
                 val r = (0..1).random()
                 val result = if (r == 0) "heads" else "tails"
-
                 "I flipped a coin and it landed on $result"
             }
 
@@ -52,9 +52,11 @@ object BotResponse {
             //Hello
             message.contains("hello") -> {
                 when (random) {
-                    0 -> "Hello there!"
+                    0 -> "Hello!"
                     1 -> "Sup"
-                    2 -> "Buongiorno!"
+                    2 -> "Hai!"
+                    3 -> "Hello, Ada yang bisa saya bantu?"
+                    4 -> "Hai,Senang Bertemeu dengan anda"
                     else -> "error" }
             }
 
@@ -90,9 +92,11 @@ object BotResponse {
             //When the programme doesn't understand...
             else -> {
                 when (random) {
-                    0 -> "I don't understand..."
-                    1 -> "Try asking me something different"
-                    2 -> "Idk"
+                    0 -> "maaf saya tidak paham"
+                    1 -> "coba pertanyaan lain"
+                    2 -> "maaf saya tidak tahu"
+                    3 -> "yo ndak tau kok tanya saya"
+                    4 -> "tanya yang mau tanya saya"
                     else -> "error"
                 }
             }
